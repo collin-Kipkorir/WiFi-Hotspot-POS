@@ -6,27 +6,38 @@ function toggleMenu() {
 
 // Subscribe to a plan
 function subscribe(plan) {
-  // Example subscription handling logic
-  switch (plan) {
-      case '1-hour':
-          alert('You have subscribed to the 1 Hour Plan. Enjoy browsing!');
-          break;
-      case '3-hours':
-          alert('You have subscribed to the 3 Hours Plan. Enjoy browsing!');
-          break;
-      case '4-hours':
-          alert('You have subscribed to the 4 Hours Plan. Enjoy browsing!');
-          break;
-      case '6-hours':
-          alert('You have subscribed to the 6 Hours Plan. Enjoy browsing!');
-          break;
-      case '8-hours':
-          alert('You have subscribed to the 8 Hours Plan. Enjoy browsing!');
-          break;
-      case '1-day':
-          alert('You have subscribed to the 1 Day Plan. Enjoy browsing!');
-          break;
-      default:
-          alert('Invalid plan. Please select a valid subscription plan.');
-  }
+  const subscriptionData = { plan }; // Define the plan data to be sent to the backend
+
+  // Displaying an alert and simulating the backend response for now
+  console.log(`Subscribing to ${plan} plan...`);
+
+  // Make the actual fetch request to the backend
+  fetch('http://localhost:3000/api/subscribe', { // Change this URL if needed
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(subscriptionData),
+  })
+  .then(response => {
+    // Check if the response is not ok
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json(); // Parse the response body as JSON
+  })
+  .then(data => {
+    // Assuming the backend returns a message field in the response
+    alert(`Subscription successful: ${data.message}`);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('There was an error with the subscription. Please try again later.');
+  });
+}
+
+
+// Close modal functionality (if you are using modal)
+function closeModal() {
+  document.getElementById('successModal').classList.add('hidden');
 }

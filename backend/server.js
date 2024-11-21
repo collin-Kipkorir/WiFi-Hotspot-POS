@@ -1,56 +1,30 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
-
+const cors = require('cors'); // Import CORS
 const app = express();
-app.use(bodyParser.json());
-app.use(express.static('public')); // Serve static files like HTML, CSS, JS
+const PORT = 3000;
 
-// In-memory subscriptions (for demo purposes)
-const subscriptions = {};
+// Enable CORS for all origins
+app.use(cors());
 
-// Serve subscription page
-app.get('/subscription', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'subscription.html'));
-});
+// Middleware to parse JSON requests
+app.use(express.json());
 
-// Handle payment simulation and subscription activation
-app.post('/subscribe', (req, res) => {
-    const { macAddress, plan } = req.body;
+// POST endpoint to handle subscription
+app.post('/api/subscribe', (req, res) => {
+    const { plan } = req.body;
 
-    if (!macAddress || !plan) {
-        res.status(400).json({ success: false, message: 'Missing macAddress or plan.' });
-        return;
+    // Validate the plan
+    if (!plan) {
+        return res.status(400).json({ message: 'Plan is required.' });
     }
 
-    // Simulate subscription activation
-    const expiryTime = Date.now() + getPlanDuration(plan);
-    subscriptions[macAddress] = expiryTime;
-
-    res.json({ success: true, message: 'Subscription activated!', expiryTime });
+    // Mock success response
+    res.status(200).json({
+        message: `You have successfully subscribed to the ${plan} plan.`,
+    });
 });
 
-// Check subscription status
-app.get('/status', (req, res) => {
-    const macAddress = req.query.macAddress;
-
-    if (!macAddress || !subscriptions[macAddress] || Date.now() > subscriptions[macAddress]) {
-        res.status(403).json({ success: false, message: 'Subscription expired or not found.' });
-    } else {
-        res.json({ success: true, message: 'Subscription active.' });
-    }
-});
-
-// Get subscription duration (in milliseconds)
-function getPlanDuration(plan) {
-    const durations = {
-        '1-hour': 60 * 60 * 1000,
-        '1-day': 24 * 60 * 60 * 1000,
-        '1-week': 7 * 24 * 60 * 60 * 1000
-    };
-    return durations[plan] || 0;
-}
-
-app.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
 });
